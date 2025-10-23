@@ -14,6 +14,8 @@ export default function Header() {
                     <Link to="/leave">Leave Request</Link>
                     {' | '}
                     <Link to="/expense">Expense Claim</Link>
+                    {' | '}
+                    <Link to="/attendance">Attendance</Link>
                 </nav>
             </div>
         </header>

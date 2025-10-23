@@ -1,0 +1,81 @@
+attendance_logs = [
+    {
+        "date": "2025-10-15",
+        "status": "Absent"
+    },
+    {
+        "date": "2025-10-23",
+        "status": "Work From Home"
+    }
+]
+
+timesheet_claims = [
+    {
+        "id": "1761036197595",
+        "date": "2025-10-22",
+        "category": "Travel",
+        "amount": 200,
+        "notes": "",
+        "status": "Pending"
+    }
+]
+
+timesheet_leave = [
+    {
+        "id": "1761202507150",
+        "date": "2025-10-30",
+        "type": "Annual",
+        "manager": "Alice Johnson",
+        "notes": "",
+        "status": "Pending"
+    },
+    {
+        "id": "1761202500893",
+        "date": "2025-10-30",
+        "type": "Annual",
+        "manager": "Alice Johnson",
+        "notes": "",
+        "status": "Pending"
+    },
+    {
+        "id": "1761036079947",
+        "date": "2025-10-22",
+        "type": "Sick",
+        "manager": "Bob Smith",
+        "notes": "",
+        "status": "Pending"
+    }
+]
+
+
+
+timesheet_logs = [
+    {
+        "start": "2025-10-23T06:43:51.542Z",
+        "end": "2025-10-23T06:44:54.314Z"
+    },
+    {
+        "start": "2025-10-21T09:55:11.430Z",
+        "end": "2025-10-21T12:06:03.137Z"
+    },
+    {
+        "start": "2025-10-21T08:57:26.626Z",
+        "end": "2025-10-21T09:06:44.300Z"
+    },
+    {
+        "start": "2025-10-21T08:21:32.935Z",
+        "end": "2025-10-21T08:53:14.085Z"
+    },
+    {
+        "start": "2025-10-21T08:18:03.831Z",
+        "end": "2025-10-21T08:21:15.779Z"
+    },
+    {
+        "start": "2025-10-21T08:16:19.572Z",
+        "end": "2025-10-21T08:16:38.633Z"
+    },
+    {
+        "start": "2025-10-21T08:05:21.423Z",
+        "end": "2025-10-21T08:05:27.190Z"
+    }
+]

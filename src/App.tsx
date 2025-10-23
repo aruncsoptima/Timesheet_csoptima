@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import TimesheetList from './pages/TimesheetList'
 import LeaveRequest from './pages/LeaveRequest'
 import ExpenseClaim from './pages/ExpenseClaim'
+import Attendance from './pages/Attendance';
 
 export default function App() {
     return (
@@ -17,6 +18,7 @@ export default function App() {
                         <Route path="/timesheets" element={<TimesheetList />} />
                         <Route path="/leave" element={<LeaveRequest />} />
                         <Route path="/expense" element={<ExpenseClaim />} />
+                        <Route path="/attendance" element={<Attendance />} />
                     </Routes>
                 </main>
             </div>
