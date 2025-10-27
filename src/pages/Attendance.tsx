@@ -1,4 +1,23 @@
 import React, { useState } from "react";
+import {
+    Container,
+    Card,
+    CardContent,
+    TextField,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    Button,
+    Typography,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody,
+    Box,
+    Alert,
+} from "@mui/material";
 
 function loadAttendance() {
     try {
@@ -14,94 +33,106 @@ function saveAttendance(data: any) {
 
 export default function Attendance() {
     const [status, setStatus] = useState("");
-    const [date, setDate] = useState(new Date().toISOString().substring(0, 10)); // default = today
+    const [date, setDate] = useState(new Date().toISOString().substring(0, 10));
     const [logs, setLogs] = useState(loadAttendance());
+    const [error, setError] = useState("");
 
     const handleSubmit = () => {
+        setError("");
+
         if (!status) {
-            alert("Please select attendance status");
+            setError("Please select attendance status");
             return;
         }
         if (!date) {
-            alert("Please select a date");
+            setError("Please select a date");
             return;
         }
 
-        // Check if record already exists for this date
         const exists = logs.some((entry: any) => entry.date === date);
         if (exists) {
-            alert(`Attendance for ${date} is already recorded.`);
+            setError(`Attendance for ${date} is already recorded.`);
             return;
         }
 
-
-
-
-        const newEntry = {
-            date: date,
-            status: status,
-        };
-
+        const newEntry = { date, status };
         const updatedLogs = [...logs, newEntry];
         setLogs(updatedLogs);
         saveAttendance(updatedLogs);
 
-        // Reset status after submit
-        setStatus("");
+        setStatus(""); // reset status
     };
 
     return (
-        <div className="container">
-            <h2>Attendance</h2>
-            <div className="card p-3 mb-3">
-                <label><strong>Date:</strong></label>
-                <input
-                    type="date"
-                    className="form-control mb-2"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                />
+        <Container maxWidth="md" sx={{ mt: 4 }}>
+            <Typography variant="h4" gutterBottom>
+                Attendance
+            </Typography>
 
-                <label><strong>Status:</strong></label>
-                <select
-                    className="form-select mb-2"
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                >
-                    <option value="">-- Choose --</option>
-                    <option value="Present">Present</option>
-                    <option value="Absent">Absent</option>
-                    <option value="Leave">Leave</option>
-                    <option value="Work From Home">Work From Home</option>
-                    <option value="OD">On Duty (OD)</option>
-                </select>
+            <Card sx={{ p: 2, mb: 3 }}>
+                <CardContent>
+                    {error && (
+                        <Alert severity="error" sx={{ mb: 2 }}>
+                            {error}
+                        </Alert>
+                    )}
 
-                <button className="btn btn-primary" onClick={handleSubmit}>
-                    Submit
-                </button>
-            </div>
+                    <TextField
+                        label="Date"
+                        type="date"
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        InputLabelProps={{ shrink: true }}
+                    />
 
-            <h3>Previous Attendance</h3>
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                        <InputLabel>Status</InputLabel>
+                        <Select
+                            value={status}
+                            label="Status"
+                            onChange={(e) => setStatus(e.target.value)}
+                        >
+                            <MenuItem value="">-- Choose --</MenuItem>
+                            <MenuItem value="Present">Present</MenuItem>
+                            <MenuItem value="Absent">Absent</MenuItem>
+                            <MenuItem value="Leave">Leave</MenuItem>
+                            <MenuItem value="Work From Home">Work From Home</MenuItem>
+                            <MenuItem value="OD">On Duty (OD)</MenuItem>
+                        </Select>
+                    </FormControl>
+
+                    <Button variant="contained" onClick={handleSubmit}>
+                        Submit
+                    </Button>
+                </CardContent>
+            </Card>
+
+            <Typography variant="h5" gutterBottom>
+                Previous Attendance
+            </Typography>
+
             {logs.length === 0 ? (
-                <div className="muted">No records found</div>
+                <Typography color="text.secondary">No records found</Typography>
             ) : (
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><strong>Date</strong></TableCell>
+                            <TableCell><strong>Status</strong></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
                         {logs.map((log: any, index: number) => (
-                            <tr key={index}>
-                                <td>{log.date}</td>
-                                <td>{log.status}</td>
-                            </tr>
+                            <TableRow key={index}>
+                                <TableCell>{log.date}</TableCell>
+                                <TableCell>{log.status}</TableCell>
+                            </TableRow>
                         ))}
-                    </tbody>
-                </table>
+                    </TableBody>
+                </Table>
             )}
-        </div>
+        </Container>
     );
 }

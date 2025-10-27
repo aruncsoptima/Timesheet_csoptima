@@ -1,141 +1,206 @@
-import React, { useState, useEffect } from 'react'
-import Sparkline from '../components/Sparkline'
+import React, { useState, useEffect } from 'react';
+import {
+    Box, Typography, TextField, Button,
+    Card, Grid, FormControl, Select, MenuItem, InputLabel,
+    Table, TableHead, TableRow, TableCell, TableBody
+} from '@mui/material';
+import Sparkline from '../components/Sparkline';
 
 type LeaveItem = {
-    id: string
-    date: string
-    type: string
-    manager: string
-    notes?: string
-    status?: string
-}
+    id: string;
+    fromDate: string;
+    toDate: string;
+    leaveType: string;
+    approver: string;
+    reason?: string;
+    status?: string;
+    approverComments?: string;
+};
 
 function loadLeaves() {
-    try { return JSON.parse(localStorage.getItem('timesheet:leaves') || '[]') as LeaveItem[] } catch { return [] }
+    try { return JSON.parse(localStorage.getItem('timesheet:leaves') || '[]') as LeaveItem[]; } catch { return []; }
 }
 
 function saveLeaves(items: LeaveItem[]) {
-    localStorage.setItem('timesheet:leaves', JSON.stringify(items))
+    localStorage.setItem('timesheet:leaves', JSON.stringify(items));
 }
 
 const managers = [
     { id: 'm1', name: 'Alice Johnson' },
     { id: 'm2', name: 'Bob Smith' },
     { id: 'm3', name: 'Clara Lee' }
-]
+];
 
 export default function LeaveRequest() {
-    const [leaves, setLeaves] = useState<LeaveItem[]>(() => loadLeaves())
-    const [date, setDate] = useState('')
-    const [type, setType] = useState('Annual')
-    const [manager, setManager] = useState(managers[0].id)
-    const [notes, setNotes] = useState('')
+    const [leaves, setLeaves] = useState<LeaveItem[]>(() => loadLeaves());
+
+    // ✅ Updated State Variables
+    const [fromDate, setFromDate] = useState('');
+    const [toDate, setToDate] = useState('');
+    const [leaveType, setLeaveType] = useState('Casual Leave');
+    const [approver, setApprover] = useState(managers[0].id);
+    const [reason, setReason] = useState('');
 
     useEffect(() => {
-        saveLeaves(leaves)
-    }, [leaves])
+        saveLeaves(leaves);
+    }, [leaves]);
 
-    // Leave metrics
-    const ALLOWANCE = 15
-    const appliedCount = leaves.length
-    const pendingCount = leaves.filter(l => l.status === 'Pending').length
-    const usedCount = leaves.filter(l => l.type === 'Annual' && l.status === 'Approved').length
-
-    // simple recent data: number of applications over last 6 entries
-    const recent = leaves.slice(0, 6).map(() => 1).reverse()
+    const ALLOWANCE = 15;
+    const appliedCount = leaves.length;
+    const pendingCount = leaves.filter(l => l.status === 'Pending').length;
+    const usedCount = leaves.filter(l => l.leaveType === 'Casual Leave' && l.status === 'Approved').length;
+    const recent = leaves.slice(0, 6).map(() => 1).reverse();
 
     function handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
-        const mgr = managers.find(m => m.id === manager)
-        const item: LeaveItem = {
+        e.preventDefault();
+        const mgr = managers.find(m => m.id === approver);
+        const newLeave: LeaveItem = {
             id: Date.now().toString(),
-            date,
-            type,
-            manager: mgr ? mgr.name : manager,
-            notes,
+            fromDate,
+            toDate,
+            leaveType,
+            approver: mgr ? mgr.name : approver,
+            reason,
             status: 'Pending'
-        }
-        setLeaves(prev => [item, ...prev])
-        setDate('')
-        setType('Annual')
-        setManager(managers[0].id)
-        setNotes('')
+        };
+        setLeaves(prev => [newLeave, ...prev]);
+
+        // Reset fields
+        setFromDate('');
+        setToDate('');
+        setLeaveType('Casual Leave');
+        setApprover(managers[0].id);
+        setReason('');
     }
 
     return (
-        <div className="container">
-            <h2>Leave Request</h2>
+        <Box p={3}>
+            <Typography variant="h5" gutterBottom>Leave Request</Typography>
 
-            <div className="card mb-2">
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div>
-                        <div className="label">Allowance</div>
-                        <div className="value">{ALLOWANCE} days</div>
-                    </div>
-                    <div>
-                        <div className="label">Used</div>
-                        <div className="value">{usedCount} days</div>
-                    </div>
-                    <div>
-                        <div className="label">Applied</div>
-                        <div className="value">{appliedCount}</div>
-                    </div>
-                    <div>
-                        <div className="label">Pending</div>
-                        <div className="value">{pendingCount}</div>
-                    </div>
-                    <div style={{ width: 140 }}><Sparkline data={recent} /></div>
-                </div>
-                <form onSubmit={handleSubmit}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                        <div>
-                            <label>Date</label>
-                            <input type="date" value={date} onChange={e => setDate(e.target.value)} required />
-                        </div>
-                        <div>
-                            <label>Type</label>
-                            <select value={type} onChange={e => setType(e.target.value)}>
-                                <option>Annual</option>
-                                <option>Sick</option>
-                                <option>Unpaid</option>
-                            </select>
-                        </div>
-                    </div>
+            <Card sx={{ p: 2, mb: 2 }}>
+                <Grid container spacing={2} alignItems="center">
+                    <Grid item>
+                        <Typography variant="body2">Allowance</Typography>
+                        <Typography variant="h6">{ALLOWANCE} days</Typography>
+                    </Grid>
+                    <Grid item>
+                        <Typography variant="body2">Used</Typography>
+                        <Typography variant="h6">{usedCount} days</Typography>
+                    </Grid>
+                    <Grid item>
+                        <Typography variant="body2">Applied</Typography>
+                        <Typography variant="h6">{appliedCount}</Typography>
+                    </Grid>
+                    <Grid item>
+                        <Typography variant="body2">Pending</Typography>
+                        <Typography variant="h6">{pendingCount}</Typography>
+                    </Grid>
+                    <Grid item sx={{ width: 140 }}>
+                        <Sparkline data={recent} />
+                    </Grid>
+                </Grid>
 
-                    <div>
-                        <label>Manager</label>
-                        <select value={manager} onChange={e => setManager(e.target.value)}>
-                            {managers.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                        </select>
-                    </div>
+                {/* ✅ Form Updated */}
+                <Box component="form" onSubmit={handleSubmit} mt={2}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                label="From Date"
+                                type="date"
+                                InputLabelProps={{ shrink: true }}
+                                value={fromDate}
+                                onChange={e => setFromDate(e.target.value)}
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                label="To Date"
+                                type="date"
+                                InputLabelProps={{ shrink: true }}
+                                value={toDate}
+                                onChange={e => setToDate(e.target.value)}
+                                required
+                            />
+                        </Grid>
+                    </Grid>
 
-                    <div>
-                        <label>Notes</label>
-                        <textarea value={notes} onChange={e => setNotes(e.target.value)} />
-                    </div>
+                    <Grid container spacing={2} mt={1}>
+                        <Grid item xs={12} md={6}>
+                            <FormControl fullWidth>
+                                <InputLabel>Leave Type</InputLabel>
+                                <Select value={leaveType} label="Leave Type" onChange={e => setLeaveType(e.target.value)}>
+                                    <MenuItem value="Casual Leave">Casual Leave</MenuItem>
+                                    <MenuItem value="Sick Leave">Sick Leave</MenuItem>
+                                    <MenuItem value="Unpaid Leave">Unpaid Leave</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <FormControl fullWidth>
+                                <InputLabel>Approver</InputLabel>
+                                <Select value={approver} label="Approver" onChange={e => setApprover(e.target.value)}>
+                                    {managers.map(m => (
+                                        <MenuItem key={m.id} value={m.id}>{m.name}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                    </Grid>
 
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <button className="btn btn-primary" type="submit">Submit request</button>
-                        <button className="btn btn-outline" type="button" onClick={() => { setDate(''); setType('Annual'); setManager(managers[0].id); setNotes('') }}>Reset</button>
-                    </div>
-                </form>
-            </div>
+                    <Box mt={2}>
+                        <TextField
+                            label="Reason"
+                            fullWidth
+                            multiline
+                            rows={3}
+                            value={reason}
+                            onChange={e => setReason(e.target.value)}
+                        />
+                    </Box>
 
-            <div className="card">
-                <h3>Your requests</h3>
+                    <Box mt={2} display="flex" gap={2}>
+                        <Button type="submit" variant="contained">Submit Request</Button>
+                        <Button type="button" variant="outlined"
+                            onClick={() => { setFromDate(''); setToDate(''); setLeaveType('Casual Leave'); setApprover(managers[0].id); setReason(''); }}>
+                            Reset
+                        </Button>
+                    </Box>
+                </Box>
+            </Card>
+
+            {/* ✅ Updated Table */}
+            <Card sx={{ p: 2 }}>
+                <Typography variant="h6">Your Requests</Typography>
                 {leaves.length === 0 ? (
-                    <div className="muted">No data found</div>
+                    <Typography color="text.secondary" sx={{ mt: 1 }}>No data found</Typography>
                 ) : (
-                    <table className="table">
-                        <thead><tr><th>Date</th><th>Type</th><th>Manager</th><th>Status</th></tr></thead>
-                        <tbody>
+                    <Table sx={{ mt: 1 }}>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>From</TableCell>
+                                <TableCell>To</TableCell>
+                                <TableCell>Type</TableCell>
+                                <TableCell>Approver</TableCell>
+                                <TableCell>Status</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
                             {leaves.map(l => (
-                                <tr key={l.id}><td>{l.date}</td><td>{l.type}</td><td>{l.manager}</td><td>{l.status}</td></tr>
+                                <TableRow key={l.id}>
+                                    <TableCell>{l.fromDate}</TableCell>
+                                    <TableCell>{l.toDate}</TableCell>
+                                    <TableCell>{l.leaveType}</TableCell>
+                                    <TableCell>{l.approver}</TableCell>
+                                    <TableCell>{l.status}</TableCell>
+                                </TableRow>
                             ))}
-                        </tbody>
-                    </table>
+                        </TableBody>
+                    </Table>
                 )}
-            </div>
-        </div>
-    )
+            </Card>
+        </Box>
+    );
 }

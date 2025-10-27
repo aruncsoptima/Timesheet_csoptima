@@ -1,29 +1,59 @@
-import React from 'react'
-import TimePunch from '../components/TimePunch'
+import React from 'react';
+import {
+    Box, Card, Typography, Table, TableBody,
+    TableCell, TableHead, TableRow
+} from '@mui/material';
+import TimePunch from '../components/TimePunch';
 
 function loadLogs() {
-    try { return JSON.parse(localStorage.getItem('timesheet:logs') || '[]') } catch { return [] }
+    try { return JSON.parse(localStorage.getItem('timesheet:logs') || '[]'); } catch { return []; }
 }
 
 export default function TimesheetList() {
-    const logs = loadLogs()
+    const logs = loadLogs();
+
     return (
-        <div className="container">
-            <h2>Timesheet Entries</h2>
-            <div className="card mb-2">
-                <h3>Quick punch</h3>
+        <Box p={3}>
+            {/* Page Title */}
+            <Typography variant="h5" gutterBottom>
+                Timesheet Entries
+            </Typography>
+
+            {/* Quick Punch Section */}
+            <Card sx={{ p: 2, mb: 2 }}>
+                <Typography variant="h6" gutterBottom>
+                    Quick Punch
+                </Typography>
                 <TimePunch />
-            </div>
+            </Card>
+
+            {/* Logs Table or Empty State */}
             {logs.length === 0 ? (
-                <div className="muted">No data found</div>
+                <Typography color="text.secondary">No data found</Typography>
             ) : (
-                <table className="table">
-                    <thead><tr><th>From</th><th>To</th></tr></thead>
-                    <tbody>
-                        {logs.map((l: any, i: number) => <tr key={i}><td>{new Date(l.start).toLocaleString()}</td><td>{l.end ? new Date(l.end).toLocaleString() : '-'}</td></tr>)}
-                    </tbody>
-                </table>
+                <Card sx={{ p: 2 }}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>From</TableCell>
+                                <TableCell>To</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {logs.map((l: any, i: number) => (
+                                <TableRow key={i}>
+                                    <TableCell>
+                                        {new Date(l.start).toLocaleString()}
+                                    </TableCell>
+                                    <TableCell>
+                                        {l.end ? new Date(l.end).toLocaleString() : '-'}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </Card>
             )}
-        </div>
-    )
+        </Box>
+    );
 }

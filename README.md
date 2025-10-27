@@ -37,7 +37,6 @@ timesheet-frontend/
 │   ├── pages/
         Attendance.tsx
         Dashboard.tsx
-        EntryForm.tsx
         ExpenseClaim.tsx
         Home.tsx
         LeaveRequest.tsx
